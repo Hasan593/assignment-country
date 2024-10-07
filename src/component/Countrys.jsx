@@ -10,15 +10,28 @@ const Countrys = () => {
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(()=>{
-        fetch(`https://restcountries.com/v3.1/all`)
-        .then(res => res.json())
-        .then(data => (setCountries(data), setFilter(data)))
+        const storeCountries = localStorage.getItem('country');  // লোকাল স্টরে কিছু থাকলে সেটা string হিসেবে থাকে
+        if (storeCountries) {
+            setCountries(JSON.parse(storeCountries));
+            setFilter(JSON.parse(storeCountries));      // কোনো কিছু যখন string থেকে object এ নিয়ে আসতে হয় তখন JSON.parse() ব্যাবহার করতে হয়
+        } else {
+            fetch(`https://restcountries.com/v3.1/all`)
+            .then(res => res.json())
+            .then(fetchData => {
+                const data = fetchData.map(cn => {
+                    return {...cn, visited: false}        // // এই ফাংশান এর দ্বারা data এর প্রত্যেক অবজেক্ট এর ভিতরে একটা করে isVisible নামে key যোগ করা হয়েছে।
+                });
+                localStorage.setItem('country', JSON.stringify(data));  // // কোনো কিছু লোকাল স্টরে রাখতে সেটাকে string করে রাখতে হয় তাই data কে string করা হয়েছে লোকাল স্টরে কিছু রাখলে সেটা key এবং value আকারে রাখতে হয় এখানে 'country' হলো key আর JSON.stringify(data)) এটা value  আবার লোকাল স্টর থেকে কিছু নিলে লোকাল স্টর এর key ধরে নিতে হয়। 13 নম্বর লাইনে যেভাবে নেওয়া হয়েছে।
+                setCountries(data), setFilter(data)
+                // console.log(data)
+            });
+        }
     }, []);
 
     useEffect(()=>{
         if (searchQuery) {
             const timerId = setTimeout(() => {
-                const searchFilter = filter.filter(cn => {
+                const searchFilter = country.filter(cn => {
                     return cn.name.common.toLowerCase().includes(searchQuery.toLowerCase());
                   });
                   setFilter(searchFilter);

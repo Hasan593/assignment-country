@@ -3,8 +3,9 @@
 import { useState } from "react";
 
 const Country = ({country, handleCountry}) => {
+  // console.log(country.visited)
 
-  const [toggle, setToggle] = useState(false);
+  const [toggle, setToggle] = useState(country.visited);
 
   // const buttonHandle = ()=>{
     //     setToggle(!toggle);
@@ -22,6 +23,15 @@ const Country = ({country, handleCountry}) => {
     // };
 
   const buttonHandle = img =>{
+    const getCountry = JSON.parse(localStorage.getItem('country')); // এখানে লোকাল স্টর থেকে ডাটা নেয়া হয়েছে
+    const findIndex = getCountry.findIndex(index => index.name.common === country.name.common); // এই ফাংশান দিয়ে মূলত লোকাল স্টর এর কোন কান্ট্রির কত নম্বর ইন্ডেক্স সেটা বের করা হয়েছে
+    // console.log(findIndex);
+    if (findIndex !== -1) {         // এখানে এই if ছাড়াও কাজ করবে
+      const updateCountry = [...getCountry];
+      updateCountry[findIndex].visited = true;
+      localStorage.setItem('country', JSON.stringify(updateCountry));
+    }
+
     img ? ( setToggle(!toggle),
     handleCountry(country)
   ) : (toggle ? handleCountry(country) : false);// এই ফাংশান এর কাজ হলো ছবিতে ক্লিক করলে মডাল আসবে নাহ, যখন বাটনে একবার ক্লিক করে বাটন টা ডিসেবল করে দিবো তখন ছবিতে ক্লিক করলে মডাল আসবে।
